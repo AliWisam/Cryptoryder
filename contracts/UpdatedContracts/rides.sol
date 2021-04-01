@@ -1,6 +1,7 @@
 pragma solidity ^0.5.16;
 
 import './Killable.sol';
+import './Authentication.sol';
 
 /*
   Unless required by applicable law or agreed to in writing, software
@@ -708,6 +709,7 @@ contract Rideshare is  Killable {
     mapping (address => Passenger) passengers;
     address[] passengerAccts;
     
+    
   }
   
   Ride[] public rides;
@@ -729,8 +731,14 @@ contract Rideshare is  Killable {
     uint totalEarning;
   } 
   
-      constructor() public {
-       
+  Authentication public authentication;
+  
+      constructor(address _authentication) public {
+       require(
+            _authentication != address(0),
+            "constructor::Cannot have null address for _authentication"
+        );
+        authentication = Authentication(_authentication);
            }
   // for now, only drivers can create Rides
   function createRide(
@@ -854,15 +862,17 @@ contract Rideshare is  Killable {
   function confirmPassengersMet(uint rideNumber, address[] memory passengerAddresses)  public {
     Ride storage curRide = rides[rideNumber];
     require(msg.sender == curRide.driver);
-    // DriverRides memory dRides;
-    
+    address _userAddress = curRide.driver;
     for(uint i=0; i < passengerAddresses.length; i++) {
       //string memory curState = curRide.passengers[passengerAddresses[i]].state;
       if (keccak256(abi.encodePacked(curRide.passengers[passengerAddresses[i]].state)) == keccak256("driverConfirmed")) {
         curRide.passengers[passengerAddresses[i]].state = "enRoute";
         DRides[msg.sender].totalRides++;
+        authentication.numberOfRidesTaken(_userAddress);
       } else {
         curRide.passengers[passengerAddresses[i]].state = "passengersConfirmed";
+        DRides[msg.sender].totalRides++;
+        authentication.numberOfRidesTaken(_userAddress);
       }
     }
     // require(rides[rideNumber].state == "confirmed");
@@ -881,15 +891,25 @@ contract Rideshare is  Killable {
   }
   
   // called by passenger
-  function arrived(uint rideNumber) public returns(uint256) {
+  function arrived(uint rideNumber, uint _rate) public returns(uint256) {
     require(passengerInRide(rideNumber, msg.sender));
     Ride storage curRide = rides[rideNumber];
+    address _userAddress = curRide.driver;
     address(uint160(curRide.driver)).transfer(curRide.passengers[msg.sender].price);
     curRide.passengers[msg.sender].state = "completion";
-    
+    authentication.updateRatingStars(_userAddress,_rate);
+    authentication.driverRating(_userAddress);
+    authentication.numberOfRidesGiven(_userAddress);
     DRides[curRide.driver].totalEarning += curRide.drivingCost;
     
     return curRide.drivingCost;
+    
+  }
+  //called by driver
+  function riderRating(uint rideNumber, address _rider) public{
+    Ride storage curRide = rides[rideNumber];
+    authentication.riderRating(_rider);
+    
     
   }
   
@@ -924,7 +944,7 @@ contract Rideshare is  Killable {
     
   }
   //filter by destinationDate
-  function filtetbyDestinationDate(uint rideNumber,uint destinationDate) public view returns(   
+  function filtetbyDestinationDate(uint rideNumber,uint _DestinationDate) public view returns(   
     address _driver,
     uint _drivingCost,
     uint _capacity,
@@ -936,7 +956,7 @@ contract Rideshare is  Killable {
     uint _departureTime,
     uint _arrivaltime) {
      Ride memory ride = rides[rideNumber];
-     if(ride.destinationDate == destinationDate){
+     if(ride.destinationDate == _DestinationDate){
       return (
       ride.driver,
       ride.drivingCost,
@@ -956,13 +976,61 @@ contract Rideshare is  Killable {
       
   }
   //filter by time of departureTime
-  function filterByTimeOfDeparture() public {
-      
-  }
+  function filterByTimeOfDeparture(uint rideNumber,uint _DepartureTime ) public view returns(   
+    address _driver,
+    uint _drivingCost,
+    uint _capacity,
+    string memory _originAddress,
+    string memory _destAddress,
+    uint _createdAt,
+    uint _confirmedAt,
+    uint _destinationDate,
+    uint _departureTime,
+    uint _arrivaltime) {
+     Ride memory ride = rides[rideNumber];
+     if(ride.departureTime == _DepartureTime){
+      return (
+      ride.driver,
+      ride.drivingCost,
+      ride.capacity,
+      ride.originAddress,
+      ride.destAddress,
+      ride.createdAt,
+      ride.confirmedAt,
+      ride.destinationDate,
+      ride.departureTime,
+      ride.arrivaltime
+    );
+     }}
+       
   
   //filter by arrival time
-  function filterByArrivalTime() public{
-      
-  }
+  function filterByArrivalTime(uint rideNumber,uint _Arrivaltime ) public view returns(   
+    address _driver,
+    uint _drivingCost,
+    uint _capacity,
+    string memory _originAddress,
+    string memory _destAddress,
+    uint _createdAt,
+    uint _confirmedAt,
+    uint _destinationDate,
+    uint _departureTime,
+    uint _arrivaltime) {
+     Ride memory ride = rides[rideNumber];
+     if(ride.arrivaltime == _Arrivaltime){
+      return (
+      ride.driver,
+      ride.drivingCost,
+      ride.capacity,
+      ride.originAddress,   
+      ride.destAddress,
+      ride.createdAt,
+      ride.confirmedAt,
+      ride.destinationDate,
+      ride.departureTime,
+      ride.arrivaltime
+    );
+     }}
+  
   
 }
