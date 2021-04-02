@@ -684,7 +684,7 @@ contract DateTime {
         }
 }
 
-contract Rideshare is  Killable {
+contract Rideshare is  Killable, DateTime {
   
   using AddrArrayLib for AddrArrayLib.Addresses;
   using Strings for string;
@@ -701,8 +701,8 @@ contract Rideshare is  Killable {
     uint capacity;
     string originAddress;
     string destAddress;
-    uint createdAt;
-    uint confirmedAt;
+    uint createdAt; 
+    uint confirmedAt;//confirmed by
     uint destinationDate;
     uint departureTime;
     uint arrivaltime;
@@ -746,12 +746,13 @@ contract Rideshare is  Killable {
   uint _capacity,
   string memory _originAddress,
   string memory _destAddress,
-  uint _confirmedAt,
-  uint _destinationDate,
-  uint _departureTime,
-  uint _arrivaltime
+  uint _confirmedAt, //confirmed by pessangers
+  uint _destinationDate,//initial 0, now in arrived function
+  uint _departureTime,// has to given by user in timestamp
+  uint _arrivaltime // initial 0
   ) public {
     address[] memory _passengerAccts;
+    
     
     rides.push(Ride(msg.sender, _driverCost,
     _capacity, _originAddress, _destAddress,
@@ -788,7 +789,7 @@ contract Rideshare is  Killable {
     string memory _originAddress,
     string memory _destAddress,
     uint _createdAt,
-    uint _confirmedAt,
+    uint _confirmedAt, 
     uint _destinationDate,
     uint _departureTime,
     uint _arrivaltime
@@ -897,19 +898,23 @@ contract Rideshare is  Killable {
     address _userAddress = curRide.driver;
     address(uint160(curRide.driver)).transfer(curRide.passengers[msg.sender].price);
     curRide.passengers[msg.sender].state = "completion";
-    authentication.updateRatingStars(_userAddress,_rate);
-    authentication.driverRating(_userAddress);
+    authentication.driverRating(_userAddress, _rate);
     authentication.numberOfRidesGiven(_userAddress);
     DRides[curRide.driver].totalEarning += curRide.drivingCost;
+    //destinationDate
+    curRide.destinationDate = block.timestamp;
+    curRide.arrivaltime = block.timestamp;
+    curRide.destinationDate = block.timestamp;
     
     return curRide.drivingCost;
     
   }
   //called by driver
-  function riderRating(uint rideNumber, address _rider) public{
+  function riderRating(uint rideNumber, uint _rate) public{
     Ride storage curRide = rides[rideNumber];
-    authentication.riderRating(_rider);
+    address _userAddress = curRide.driver;
     
+    authentication.riderRating(_userAddress,_rate);
     
   }
   
@@ -970,9 +975,6 @@ contract Rideshare is  Killable {
       ride.arrivaltime
     );
      }
-        
-        
-        
       
   }
   //filter by time of departureTime

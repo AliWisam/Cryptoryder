@@ -6,9 +6,8 @@ contract Authentication is Killable {
     bytes32 name;
     uint8 age;
     uint256 phoneNumber;
-    uint ratings; // 5 rating stars
-    uint8 driverRating;
-    uint8 riderRating;
+    uint[] driverRating;
+    uint[] riderRating;
     uint8 numberOfRidesGiven;// driver
     uint8 numberOfRidesTaken; //passenger
   }
@@ -111,18 +110,15 @@ contract Authentication is Killable {
     }
   }
   
-  function updateRatingStars(address _userAddress, uint _rate) public {
-      require(_rate < 5,"rating start should be less than 5");
-      users[_userAddress].ratings = _rate;
+    //called by Passenger
+  function driverRating(address _userAddress, uint _driverRating) public {
+      require(_driverRating < 5,"rating start should be less than 5");
+      users[_userAddress].driverRating.push(_driverRating);
     }
-  //here
-  function driverRating(address _userAddress, uint8 _driverRating) public {
-      
-      users[_userAddress].driverRating = _driverRating;
-    }
-    
-    function riderRating(address _userAddress) public {
-      users[_userAddress].riderRating++;
+    //called by driver
+    function riderRating(address _userAddress, uint _riderRating) public {
+      require(_riderRating < 5,"rating start should be less than 5");
+      users[_userAddress].riderRating.push(_riderRating);
     }
     
     function numberOfRidesGiven(address _userAddress) public {
@@ -135,28 +131,5 @@ contract Authentication is Killable {
   
   
   
-//   function updateRatingAndRides(
-//     uint8 ratings,
-//     uint8 driverRating,
-//     uint8 riderRating,
-//     uint8 numberOfRidesGiven,
-//     uint8 numberOfRidesTaken) internal onlyExistingUser returns(uint8,uint8,uint8,uint8,uint8){
-//     if (users[msg.sender].ratings >= 0 && users[msg.sender].ratings <=5 
-//     && users[msg.sender].driverRating >= 0 && users[msg.sender].driverRating <=5
-//     && users[msg.sender].riderRating >= 0 && users[msg.sender].riderRating <=5
-//     ){
-//     users[msg.sender].ratings = ratings;
-//     users[msg.sender].driverRating = driverRating;
-//     users[msg.sender].riderRating = riderRating;
-//     users[msg.sender].numberOfRidesGiven = numberOfRidesGiven;
-//     users[msg.sender].numberOfRidesTaken = numberOfRidesTaken;
-//     }
-//     return(
-//     users[msg.sender].ratings,
-//     users[msg.sender].driverRating,
-//     users[msg.sender].riderRating,
-//     users[msg.sender].numberOfRidesGiven,
-//     users[msg.sender].numberOfRidesTaken
-//     );
-//     }
+
 }
