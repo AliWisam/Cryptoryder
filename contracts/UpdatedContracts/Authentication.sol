@@ -128,8 +128,20 @@ contract Authentication is Killable {
     function numberOfRidesTaken(address _userAddress) public {
       users[_userAddress].numberOfRidesTaken++;
     }
-  
-  
-  
+    function getUserData(address _userAddress) public view 
+    returns(bytes32 name, uint age,uint256 phoneNumber,
+    uint NumberOfRidesGiven,uint NumberOfRidesTaken ,uint[] memory,uint[] memory){
+        
+       return (
+            users[_userAddress].name,
+            users[_userAddress].age,
+            users[_userAddress].phoneNumber,
+            users[_userAddress].numberOfRidesGiven,
+            users[_userAddress].numberOfRidesTaken,
+            users[_userAddress].riderRating,
+            users[_userAddress].driverRating
+       );
+               
+    }
 
 }

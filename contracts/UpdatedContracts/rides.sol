@@ -11,85 +11,85 @@ import './Authentication.sol';
   limitations under the License.
 */
 
-library AddrArrayLib {
-    using AddrArrayLib for Addresses;
+// library AddrArrayLib {
+//     using AddrArrayLib for Addresses;
 
-    struct Addresses {
-      address[]  _items;
-    }
+//     struct Addresses {
+//       address[]  _items;
+//     }
 
-    /**
-     * @notice push an address to the array
-     * @dev if the address already exists, it will not be added again
-     * @param self Storage array containing address type variables
-     * @param element the element to add in the array
-     */
-    function pushAddress(Addresses storage self, address element) internal {
-      if (!exists(self, element)) {
-        self._items.push(element);
-      }
-    }
+//     /**
+//      * @notice push an address to the array
+//      * @dev if the address already exists, it will not be added again
+//      * @param self Storage array containing address type variables
+//      * @param element the element to add in the array
+//      */
+//     function pushAddress(Addresses storage self, address element) internal {
+//       if (!exists(self, element)) {
+//         self._items.push(element);
+//       }
+//     }
 
-    /**
-     * @notice remove an address from the array
-     * @dev finds the element, swaps it with the last element, and then deletes it;
-     *      returns a boolean whether the element was found and deleted
-     * @param self Storage array containing address type variables
-     * @param element the element to remove from the array
-     */
-    function removeAddress(Addresses storage self, address element) internal returns (bool) {
-        for (uint i = 0; i < self.size(); i++) {
-            if (self._items[i] == element) {
-                self._items[i] = self._items[self.size() - 1];
-                self._items.pop();
-                return true;
-            }
-        }
-        return false;
-    }
+//     /**
+//      * @notice remove an address from the array
+//      * @dev finds the element, swaps it with the last element, and then deletes it;
+//      *      returns a boolean whether the element was found and deleted
+//      * @param self Storage array containing address type variables
+//      * @param element the element to remove from the array
+//      */
+//     function removeAddress(Addresses storage self, address element) internal returns (bool) {
+//         for (uint i = 0; i < self.size(); i++) {
+//             if (self._items[i] == element) {
+//                 self._items[i] = self._items[self.size() - 1];
+//                 self._items.pop();
+//                 return true;
+//             }
+//         }
+//         return false;
+//     }
 
-    /**
-     * @notice get the address at a specific index from array
-     * @dev revert if the index is out of bounds
-     * @param self Storage array containing address type variables
-     * @param index the index in the array
-     */
-    function getAddressAtIndex(Addresses storage self, uint256 index) internal view returns (address) {
-        require(index < size(self), "the index is out of bounds");
-        return self._items[index];
-    }
+//     /**
+//      * @notice get the address at a specific index from array
+//      * @dev revert if the index is out of bounds
+//      * @param self Storage array containing address type variables
+//      * @param index the index in the array
+//      */
+//     function getAddressAtIndex(Addresses storage self, uint256 index) internal view returns (address) {
+//         require(index < size(self), "the index is out of bounds");
+//         return self._items[index];
+//     }
 
-    /**
-     * @notice get the size of the array
-     * @param self Storage array containing address type variables
-     */
-    function size(Addresses storage self) internal view returns (uint256) {
-      return self._items.length;
-    }
+//     /**
+//      * @notice get the size of the array
+//      * @param self Storage array containing address type variables
+//      */
+//     function size(Addresses storage self) internal view returns (uint256) {
+//       return self._items.length;
+//     }
 
-    /**
-     * @notice check if an element exist in the array
-     * @param self Storage array containing address type variables
-     * @param element the element to check if it exists in the array
-     */
-    function exists(Addresses storage self, address element) internal view returns (bool) {
-        for (uint i = 0; i < self.size(); i++) {
-            if (self._items[i] == element) {
-                return true;
-            }
-        }
-        return false;
-    }
+//     /**
+//      * @notice check if an element exist in the array
+//      * @param self Storage array containing address type variables
+//      * @param element the element to check if it exists in the array
+//      */
+//     function exists(Addresses storage self, address element) internal view returns (bool) {
+//         for (uint i = 0; i < self.size(); i++) {
+//             if (self._items[i] == element) {
+//                 return true;
+//             }
+//         }
+//         return false;
+//     }
 
-    /**
-     * @notice get the array
-     * @param self Storage array containing address type variables
-     */
-    function getAllAddresses(Addresses storage self) internal view returns(address[] memory) {
-        return self._items;
-    }
+//     /**
+//      * @notice get the array
+//      * @param self Storage array containing address type variables
+//      */
+//     function getAllAddresses(Addresses storage self) internal view returns(address[] memory) {
+//         return self._items;
+//     }
 
-}
+// }
 
 /**
  * Strings Library
@@ -473,221 +473,311 @@ library Strings {
 }
 
 //date time 
-contract DateTime {
-        struct _DateTime {
-                uint16 year;
-                uint8 month;
-                uint8 day;
-                uint8 hour;
-                uint8 minute;
-                uint8 second;
-                uint8 weekday;
+// ----------------------------------------------------------------------------
+// BokkyPooBah's DateTime Library v1.01
+//
+// A gas-efficient Solidity date and time library
+//
+// https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
+//
+// Tested date range 1970/01/01 to 2345/12/31
+//
+// Conventions:
+// Unit      | Range         | Notes
+// :-------- |:-------------:|:-----
+// timestamp | >= 0          | Unix timestamp, number of seconds since 1970/01/01 00:00:00 UTC
+// year      | 1970 ... 2345 |
+// month     | 1 ... 12      |
+// day       | 1 ... 31      |
+// hour      | 0 ... 23      |
+// minute    | 0 ... 59      |
+// second    | 0 ... 59      |
+// dayOfWeek | 1 ... 7       | 1 = Monday, ..., 7 = Sunday
+//
+//
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018-2019. The MIT Licence.
+// ----------------------------------------------------------------------------
+
+library BokkyPooBahsDateTimeLibrary {
+
+    uint constant SECONDS_PER_DAY = 24 * 60 * 60;
+    uint constant SECONDS_PER_HOUR = 60 * 60;
+    uint constant SECONDS_PER_MINUTE = 60;
+    int constant OFFSET19700101 = 2440588;
+
+    uint constant DOW_MON = 1;
+    uint constant DOW_TUE = 2;
+    uint constant DOW_WED = 3;
+    uint constant DOW_THU = 4;
+    uint constant DOW_FRI = 5;
+    uint constant DOW_SAT = 6;
+    uint constant DOW_SUN = 7;
+
+    // ------------------------------------------------------------------------
+    // Calculate the number of days from 1970/01/01 to year/month/day using
+    // the date conversion algorithm from
+    //   http://aa.usno.navy.mil/faq/docs/JD_Formula.php
+    // and subtracting the offset 2440588 so that 1970/01/01 is day 0
+    //
+    // days = day
+    //      - 32075
+    //      + 1461 * (year + 4800 + (month - 14) / 12) / 4
+    //      + 367 * (month - 2 - (month - 14) / 12 * 12) / 12
+    //      - 3 * ((year + 4900 + (month - 14) / 12) / 100) / 4
+    //      - offset
+    // ------------------------------------------------------------------------
+    function _daysFromDate(uint year, uint month, uint day) internal pure returns (uint _days) {
+        require(year >= 1970);
+        int _year = int(year);
+        int _month = int(month);
+        int _day = int(day);
+
+        int __days = _day
+          - 32075
+          + 1461 * (_year + 4800 + (_month - 14) / 12) / 4
+          + 367 * (_month - 2 - (_month - 14) / 12 * 12) / 12
+          - 3 * ((_year + 4900 + (_month - 14) / 12) / 100) / 4
+          - OFFSET19700101;
+
+        _days = uint(__days);
+    }
+
+    // ------------------------------------------------------------------------
+    // Calculate year/month/day from the number of days since 1970/01/01 using
+    // the date conversion algorithm from
+    //   http://aa.usno.navy.mil/faq/docs/JD_Formula.php
+    // and adding the offset 2440588 so that 1970/01/01 is day 0
+    //
+    // int L = days + 68569 + offset
+    // int N = 4 * L / 146097
+    // L = L - (146097 * N + 3) / 4
+    // year = 4000 * (L + 1) / 1461001
+    // L = L - 1461 * year / 4 + 31
+    // month = 80 * L / 2447
+    // dd = L - 2447 * month / 80
+    // L = month / 11
+    // month = month + 2 - 12 * L
+    // year = 100 * (N - 49) + year + L
+    // ------------------------------------------------------------------------
+    function _daysToDate(uint _days) internal pure returns (uint year, uint month, uint day) {
+        int __days = int(_days);
+
+        int L = __days + 68569 + OFFSET19700101;
+        int N = 4 * L / 146097;
+        L = L - (146097 * N + 3) / 4;
+        int _year = 4000 * (L + 1) / 1461001;
+        L = L - 1461 * _year / 4 + 31;
+        int _month = 80 * L / 2447;
+        int _day = L - 2447 * _month / 80;
+        L = _month / 11;
+        _month = _month + 2 - 12 * L;
+        _year = 100 * (N - 49) + _year + L;
+
+        year = uint(_year);
+        month = uint(_month);
+        day = uint(_day);
+    }
+
+    function timestampFromDate(uint year, uint month, uint day) internal pure returns (uint timestamp) {
+        timestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY;
+    }
+    function timestampFromDateTime(uint year, uint month, uint day, uint hour, uint minute, uint second) internal pure returns (uint timestamp) {
+        timestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY + hour * SECONDS_PER_HOUR + minute * SECONDS_PER_MINUTE + second;
+    }
+    function timestampToDate(uint timestamp) internal pure returns (uint year, uint month, uint day) {
+        (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+    }
+    function timestampToDateTime(uint timestamp) internal pure returns (uint year, uint month, uint day, uint hour, uint minute, uint second) {
+        (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        uint secs = timestamp % SECONDS_PER_DAY;
+        hour = secs / SECONDS_PER_HOUR;
+        secs = secs % SECONDS_PER_HOUR;
+        minute = secs / SECONDS_PER_MINUTE;
+        second = secs % SECONDS_PER_MINUTE;
+    }
+
+    function isValidDate(uint year, uint month, uint day) internal pure returns (bool valid) {
+        if (year >= 1970 && month > 0 && month <= 12) {
+            uint daysInMonth = _getDaysInMonth(year, month);
+            if (day > 0 && day <= daysInMonth) {
+                valid = true;
+            }
         }
-
-        uint constant DAY_IN_SECONDS = 86400;
-        uint constant YEAR_IN_SECONDS = 31536000;
-        uint constant LEAP_YEAR_IN_SECONDS = 31622400;
-
-        uint constant HOUR_IN_SECONDS = 3600;
-        uint constant MINUTE_IN_SECONDS = 60;
-
-        uint16 constant ORIGIN_YEAR = 1970;
-
-        function isLeapYear(uint16 year) public pure returns (bool) {
-                if (year % 4 != 0) {
-                        return false;
-                }
-                if (year % 100 != 0) {
-                        return true;
-                }
-                if (year % 400 != 0) {
-                        return false;
-                }
-                return true;
+    }
+    function isValidDateTime(uint year, uint month, uint day, uint hour, uint minute, uint second) internal pure returns (bool valid) {
+        if (isValidDate(year, month, day)) {
+            if (hour < 24 && minute < 60 && second < 60) {
+                valid = true;
+            }
         }
-
-        function leapYearsBefore(uint year) public pure returns (uint) {
-                year -= 1;
-                return year / 4 - year / 100 + year / 400;
+    }
+    function isLeapYear(uint timestamp) internal pure returns (bool leapYear) {
+        (uint year,,) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        leapYear = _isLeapYear(year);
+    }
+    function _isLeapYear(uint year) internal pure returns (bool leapYear) {
+        leapYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+    }
+    function isWeekDay(uint timestamp) internal pure returns (bool weekDay) {
+        weekDay = getDayOfWeek(timestamp) <= DOW_FRI;
+    }
+    function isWeekEnd(uint timestamp) internal pure returns (bool weekEnd) {
+        weekEnd = getDayOfWeek(timestamp) >= DOW_SAT;
+    }
+    function getDaysInMonth(uint timestamp) internal pure returns (uint daysInMonth) {
+        (uint year, uint month,) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        daysInMonth = _getDaysInMonth(year, month);
+    }
+    function _getDaysInMonth(uint year, uint month) internal pure returns (uint daysInMonth) {
+        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+            daysInMonth = 31;
+        } else if (month != 2) {
+            daysInMonth = 30;
+        } else {
+            daysInMonth = _isLeapYear(year) ? 29 : 28;
         }
+    }
+    // 1 = Monday, 7 = Sunday
+    function getDayOfWeek(uint timestamp) internal pure returns (uint dayOfWeek) {
+        uint _days = timestamp / SECONDS_PER_DAY;
+        dayOfWeek = (_days + 3) % 7 + 1;
+    }
 
-        function getDaysInMonth(uint8 month, uint16 year) public pure returns (uint8) {
-                if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-                        return 31;
-                }
-                else if (month == 4 || month == 6 || month == 9 || month == 11) {
-                        return 30;
-                }
-                else if (isLeapYear(year)) {
-                        return 29;
-                }
-                else {
-                        return 28;
-                }
+    function getYear(uint timestamp) internal pure returns (uint year) {
+        (year,,) = _daysToDate(timestamp / SECONDS_PER_DAY);
+    }
+    function getMonth(uint timestamp) internal pure returns (uint month) {
+        (,month,) = _daysToDate(timestamp / SECONDS_PER_DAY);
+    }
+    function getDay(uint timestamp) internal pure returns (uint day) {
+        (,,day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+    }
+    function getHour(uint timestamp) internal pure returns (uint hour) {
+        uint secs = timestamp % SECONDS_PER_DAY;
+        hour = secs / SECONDS_PER_HOUR;
+    }
+    function getMinute(uint timestamp) internal pure returns (uint minute) {
+        uint secs = timestamp % SECONDS_PER_HOUR;
+        minute = secs / SECONDS_PER_MINUTE;
+    }
+    function getSecond(uint timestamp) internal pure returns (uint second) {
+        second = timestamp % SECONDS_PER_MINUTE;
+    }
+
+    function addYears(uint timestamp, uint _years) internal pure returns (uint newTimestamp) {
+        (uint year, uint month, uint day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        year += _years;
+        uint daysInMonth = _getDaysInMonth(year, month);
+        if (day > daysInMonth) {
+            day = daysInMonth;
         }
-
-        function parseTimestamp(uint timestamp) internal pure returns (_DateTime memory dt) {
-                uint secondsAccountedFor = 0;
-                uint buf;
-                uint8 i;
-
-                // Year
-                dt.year = getYear(timestamp);
-                buf = leapYearsBefore(dt.year) - leapYearsBefore(ORIGIN_YEAR);
-
-                secondsAccountedFor += LEAP_YEAR_IN_SECONDS * buf;
-                secondsAccountedFor += YEAR_IN_SECONDS * (dt.year - ORIGIN_YEAR - buf);
-
-                // Month
-                uint secondsInMonth;
-                for (i = 1; i <= 12; i++) {
-                        secondsInMonth = DAY_IN_SECONDS * getDaysInMonth(i, dt.year);
-                        if (secondsInMonth + secondsAccountedFor > timestamp) {
-                                dt.month = i;
-                                break;
-                        }
-                        secondsAccountedFor += secondsInMonth;
-                }
-
-                // Day
-                for (i = 1; i <= getDaysInMonth(dt.month, dt.year); i++) {
-                        if (DAY_IN_SECONDS + secondsAccountedFor > timestamp) {
-                                dt.day = i;
-                                break;
-                        }
-                        secondsAccountedFor += DAY_IN_SECONDS;
-                }
-
-                // Hour
-                dt.hour = getHour(timestamp);
-
-                // Minute
-                dt.minute = getMinute(timestamp);
-
-                // Second
-                dt.second = getSecond(timestamp);
-
-                // Day of week.
-                dt.weekday = getWeekday(timestamp);
+        newTimestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY + timestamp % SECONDS_PER_DAY;
+        require(newTimestamp >= timestamp);
+    }
+    function addMonths(uint timestamp, uint _months) internal pure returns (uint newTimestamp) {
+        (uint year, uint month, uint day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        month += _months;
+        year += (month - 1) / 12;
+        month = (month - 1) % 12 + 1;
+        uint daysInMonth = _getDaysInMonth(year, month);
+        if (day > daysInMonth) {
+            day = daysInMonth;
         }
+        newTimestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY + timestamp % SECONDS_PER_DAY;
+        require(newTimestamp >= timestamp);
+    }
+    function addDays(uint timestamp, uint _days) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp + _days * SECONDS_PER_DAY;
+        require(newTimestamp >= timestamp);
+    }
+    function addHours(uint timestamp, uint _hours) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp + _hours * SECONDS_PER_HOUR;
+        require(newTimestamp >= timestamp);
+    }
+    function addMinutes(uint timestamp, uint _minutes) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp + _minutes * SECONDS_PER_MINUTE;
+        require(newTimestamp >= timestamp);
+    }
+    function addSeconds(uint timestamp, uint _seconds) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp + _seconds;
+        require(newTimestamp >= timestamp);
+    }
 
-        function getYear(uint timestamp) public pure returns (uint16) {
-                uint secondsAccountedFor = 0;
-                uint16 year;
-                uint numLeapYears;
-
-                // Year
-                year = uint16(ORIGIN_YEAR + timestamp / YEAR_IN_SECONDS);
-                numLeapYears = leapYearsBefore(year) - leapYearsBefore(ORIGIN_YEAR);
-
-                secondsAccountedFor += LEAP_YEAR_IN_SECONDS * numLeapYears;
-                secondsAccountedFor += YEAR_IN_SECONDS * (year - ORIGIN_YEAR - numLeapYears);
-
-                while (secondsAccountedFor > timestamp) {
-                        if (isLeapYear(uint16(year - 1))) {
-                                secondsAccountedFor -= LEAP_YEAR_IN_SECONDS;
-                        }
-                        else {
-                                secondsAccountedFor -= YEAR_IN_SECONDS;
-                        }
-                        year -= 1;
-                }
-                return year;
+    function subYears(uint timestamp, uint _years) internal pure returns (uint newTimestamp) {
+        (uint year, uint month, uint day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        year -= _years;
+        uint daysInMonth = _getDaysInMonth(year, month);
+        if (day > daysInMonth) {
+            day = daysInMonth;
         }
-
-        function getMonth(uint timestamp) public pure returns (uint8) {
-                return parseTimestamp(timestamp).month;
+        newTimestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY + timestamp % SECONDS_PER_DAY;
+        require(newTimestamp <= timestamp);
+    }
+    function subMonths(uint timestamp, uint _months) internal pure returns (uint newTimestamp) {
+        (uint year, uint month, uint day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+        uint yearMonth = year * 12 + (month - 1) - _months;
+        year = yearMonth / 12;
+        month = yearMonth % 12 + 1;
+        uint daysInMonth = _getDaysInMonth(year, month);
+        if (day > daysInMonth) {
+            day = daysInMonth;
         }
+        newTimestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY + timestamp % SECONDS_PER_DAY;
+        require(newTimestamp <= timestamp);
+    }
+    function subDays(uint timestamp, uint _days) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp - _days * SECONDS_PER_DAY;
+        require(newTimestamp <= timestamp);
+    }
+    function subHours(uint timestamp, uint _hours) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp - _hours * SECONDS_PER_HOUR;
+        require(newTimestamp <= timestamp);
+    }
+    function subMinutes(uint timestamp, uint _minutes) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp - _minutes * SECONDS_PER_MINUTE;
+        require(newTimestamp <= timestamp);
+    }
+    function subSeconds(uint timestamp, uint _seconds) internal pure returns (uint newTimestamp) {
+        newTimestamp = timestamp - _seconds;
+        require(newTimestamp <= timestamp);
+    }
 
-        function getDay(uint timestamp) public pure returns (uint8) {
-                return parseTimestamp(timestamp).day;
-        }
-
-        function getHour(uint timestamp) public pure returns (uint8) {
-                return uint8((timestamp / 60 / 60) % 24);
-        }
-
-        function getMinute(uint timestamp) public pure returns (uint8) {
-                return uint8((timestamp / 60) % 60);
-        }
-
-        function getSecond(uint timestamp) public pure returns (uint8) {
-                return uint8(timestamp % 60);
-        }
-
-        function getWeekday(uint timestamp) public pure returns (uint8) {
-                return uint8((timestamp / DAY_IN_SECONDS + 4) % 7);
-        }
-
-        function toTimestamp(uint16 year, uint8 month, uint8 day) public pure returns (uint timestamp) {
-                return toTimestamp(year, month, day, 0, 0, 0);
-        }
-
-        function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour) public pure returns (uint timestamp) {
-                return toTimestamp(year, month, day, hour, 0, 0);
-        }
-
-        function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute) public pure returns (uint timestamp) {
-                return toTimestamp(year, month, day, hour, minute, 0);
-        }
-
-        function toTimestamp(uint16 year, uint8 month, uint8 day, uint8 hour, uint8 minute, uint8 second) public pure returns (uint timestamp) {
-                uint16 i;
-
-                // Year
-                for (i = ORIGIN_YEAR; i < year; i++) {
-                        if (isLeapYear(i)) {
-                                timestamp += LEAP_YEAR_IN_SECONDS;
-                        }
-                        else {
-                                timestamp += YEAR_IN_SECONDS;
-                        }
-                }
-
-                // Month
-                uint8[12] memory monthDayCounts;
-                monthDayCounts[0] = 31;
-                if (isLeapYear(year)) {
-                        monthDayCounts[1] = 29;
-                }
-                else {
-                        monthDayCounts[1] = 28;
-                }
-                monthDayCounts[2] = 31;
-                monthDayCounts[3] = 30;
-                monthDayCounts[4] = 31;
-                monthDayCounts[5] = 30;
-                monthDayCounts[6] = 31;
-                monthDayCounts[7] = 31;
-                monthDayCounts[8] = 30;
-                monthDayCounts[9] = 31;
-                monthDayCounts[10] = 30;
-                monthDayCounts[11] = 31;
-
-                for (i = 1; i < month; i++) {
-                        timestamp += DAY_IN_SECONDS * monthDayCounts[i - 1];
-                }
-
-                // Day
-                timestamp += DAY_IN_SECONDS * (day - 1);
-
-                // Hour
-                timestamp += HOUR_IN_SECONDS * (hour);
-
-                // Minute
-                timestamp += MINUTE_IN_SECONDS * (minute);
-
-                // Second
-                timestamp += second;
-
-                return timestamp;
-        }
+    function diffYears(uint fromTimestamp, uint toTimestamp) internal pure returns (uint _years) {
+        require(fromTimestamp <= toTimestamp);
+        (uint fromYear,,) = _daysToDate(fromTimestamp / SECONDS_PER_DAY);
+        (uint toYear,,) = _daysToDate(toTimestamp / SECONDS_PER_DAY);
+        _years = toYear - fromYear;
+    }
+    function diffMonths(uint fromTimestamp, uint toTimestamp) internal pure returns (uint _months) {
+        require(fromTimestamp <= toTimestamp);
+        (uint fromYear, uint fromMonth,) = _daysToDate(fromTimestamp / SECONDS_PER_DAY);
+        (uint toYear, uint toMonth,) = _daysToDate(toTimestamp / SECONDS_PER_DAY);
+        _months = toYear * 12 + toMonth - fromYear * 12 - fromMonth;
+    }
+    function diffDays(uint fromTimestamp, uint toTimestamp) internal pure returns (uint _days) {
+        require(fromTimestamp <= toTimestamp);
+        _days = (toTimestamp - fromTimestamp) / SECONDS_PER_DAY;
+    }
+    function diffHours(uint fromTimestamp, uint toTimestamp) internal pure returns (uint _hours) {
+        require(fromTimestamp <= toTimestamp);
+        _hours = (toTimestamp - fromTimestamp) / SECONDS_PER_HOUR;
+    }
+    function diffMinutes(uint fromTimestamp, uint toTimestamp) internal pure returns (uint _minutes) {
+        require(fromTimestamp <= toTimestamp);
+        _minutes = (toTimestamp - fromTimestamp) / SECONDS_PER_MINUTE;
+    }
+    function diffSeconds(uint fromTimestamp, uint toTimestamp) internal pure returns (uint _seconds) {
+        require(fromTimestamp <= toTimestamp);
+        _seconds = toTimestamp - fromTimestamp;
+    }
 }
 
-contract Rideshare is  Killable, DateTime {
+contract Rideshare is  Killable {
   
-  using AddrArrayLib for AddrArrayLib.Addresses;
+  //using AddrArrayLib for AddrArrayLib.Addresses;
   using Strings for string;
+  //using dataTime library
+  using BokkyPooBahsDateTimeLibrary for uint32;
     
     
   struct Passenger {
@@ -697,6 +787,7 @@ contract Rideshare is  Killable, DateTime {
 
   struct Ride {
     address driver;
+    string carName;
     uint drivingCost;
     uint capacity;
     string originAddress;
@@ -708,8 +799,8 @@ contract Rideshare is  Killable, DateTime {
     uint arrivaltime;
     mapping (address => Passenger) passengers;
     address[] passengerAccts;
-    
-    
+    mapping(address=>bool) hasPaid;
+    uint unPaidTimestamp;
   }
   
   Ride[] public rides;
@@ -742,6 +833,7 @@ contract Rideshare is  Killable, DateTime {
            }
   // for now, only drivers can create Rides
   function createRide(
+  string memory _carName,
   uint _driverCost,
   uint _capacity,
   string memory _originAddress,
@@ -749,16 +841,17 @@ contract Rideshare is  Killable, DateTime {
   uint _confirmedAt, //confirmed by pessangers
   uint _destinationDate,//initial 0, now in arrived function
   uint _departureTime,// has to given by user in timestamp
-  uint _arrivaltime // initial 0
+  uint _arrivaltime, // initial 0
+  uint32 _unPaidTimestamp //initial 0
   ) public {
     address[] memory _passengerAccts;
     
     
-    rides.push(Ride(msg.sender, _driverCost,
+    rides.push(Ride(msg.sender,_carName ,_driverCost,
     _capacity, _originAddress, _destAddress,
     block.timestamp, _confirmedAt, _destinationDate,
     _departureTime,_arrivaltime,
-    _passengerAccts));
+    _passengerAccts,_unPaidTimestamp));
   }
   
   
@@ -784,6 +877,7 @@ contract Rideshare is  Killable, DateTime {
 
   function getRide(uint rideNumber) public view returns (
     address _driver,
+    string memory _carName,
     uint _drivingCost,
     uint _capacity,
     string memory _originAddress,
@@ -797,6 +891,7 @@ contract Rideshare is  Killable, DateTime {
     Ride memory ride = rides[rideNumber];
     return (
       ride.driver,
+      ride.carName,
       ride.drivingCost,
       ride.capacity,
       ride.originAddress,
@@ -864,6 +959,7 @@ contract Rideshare is  Killable, DateTime {
     Ride storage curRide = rides[rideNumber];
     require(msg.sender == curRide.driver);
     address _userAddress = curRide.driver;
+    
     for(uint i=0; i < passengerAddresses.length; i++) {
       //string memory curState = curRide.passengers[passengerAddresses[i]].state;
       if (keccak256(abi.encodePacked(curRide.passengers[passengerAddresses[i]].state)) == keccak256("driverConfirmed")) {
@@ -898,6 +994,8 @@ contract Rideshare is  Killable, DateTime {
     address _userAddress = curRide.driver;
     address(uint160(curRide.driver)).transfer(curRide.passengers[msg.sender].price);
     curRide.passengers[msg.sender].state = "completion";
+    //for keeping record that this passenger has paid rent
+    curRide.hasPaid[msg.sender] = true;
     authentication.driverRating(_userAddress, _rate);
     authentication.numberOfRidesGiven(_userAddress);
     DRides[curRide.driver].totalEarning += curRide.drivingCost;
@@ -905,9 +1003,11 @@ contract Rideshare is  Killable, DateTime {
     curRide.destinationDate = block.timestamp;
     curRide.arrivaltime = block.timestamp;
     curRide.destinationDate = block.timestamp;
+    curRide.unPaidTimestamp = block.timestamp;
+    
+    //paid accounts
     
     return curRide.drivingCost;
-    
   }
   //called by driver
   function riderRating(uint rideNumber, uint _rate) public{
@@ -918,9 +1018,41 @@ contract Rideshare is  Killable, DateTime {
     
   }
   
+  //called by driver
+  function getPaidPassengers(uint rideNumber, address _passengerAddress) view public returns(bool) {
+    Ride storage curRide = rides[rideNumber];
+     return curRide.hasPaid[_passengerAddress];
+  }
+    //called by driver
+  function getMoneyFromUnPaidPassendgers(uint rideNumber) public returns(bool){
+    Ride storage curRide = rides[rideNumber];
+    
+   uint t= BokkyPooBahsDateTimeLibrary.addMinutes(curRide.unPaidTimestamp, 5);
+    require(curRide.unPaidTimestamp >=t ,"time not completed to call");
+    
+    for (uint i = 0; i <= curRide.passengerAccts.length; i++) {
+    //checking bool and state
+    if( curRide.hasPaid[curRide.passengerAccts[i]]= false){
+    require(Strings.compareTo(curRide.passengers[curRide.passengerAccts[i]].state,
+    curRide.passengers[curRide.passengerAccts[i]].state),"this passenger is not in this ride or has paid");
+    address(uint160(curRide.driver)).transfer(curRide.passengers[curRide.passengerAccts[i]].price);
+       
+        return true;
+        
+     }
+     else
+     {
+         return false;
+     }
+        
+    }
+  }
+  
+  
   //filters by origin
   function filterByOrigin(uint rideNumber, string memory _origin) public view returns (
     address _driver,
+    string memory _carName,
     uint _drivingCost,
     uint _capacity,
     string memory _originAddress,
@@ -935,11 +1067,13 @@ contract Rideshare is  Killable, DateTime {
      if(Strings.compareTo(ride.originAddress,_origin)){
       return (
       ride.driver,
+      ride.carName,
       ride.drivingCost,
       ride.capacity,
       ride.originAddress,
       ride.destAddress,
       ride.createdAt,
+      //BokkyPooBahsDateTimeLibrary.timestampToDate(ride.createdAt),
       ride.confirmedAt,
       ride.destinationDate,
       ride.departureTime,
@@ -951,6 +1085,7 @@ contract Rideshare is  Killable, DateTime {
   //filter by destinationDate
   function filtetbyDestinationDate(uint rideNumber,uint _DestinationDate) public view returns(   
     address _driver,
+    string memory _carName,
     uint _drivingCost,
     uint _capacity,
     string memory _originAddress,
@@ -964,6 +1099,7 @@ contract Rideshare is  Killable, DateTime {
      if(ride.destinationDate == _DestinationDate){
       return (
       ride.driver,
+      ride.carName,
       ride.drivingCost,
       ride.capacity,
       ride.originAddress,
@@ -980,6 +1116,7 @@ contract Rideshare is  Killable, DateTime {
   //filter by time of departureTime
   function filterByTimeOfDeparture(uint rideNumber,uint _DepartureTime ) public view returns(   
     address _driver,
+    string memory _carName,
     uint _drivingCost,
     uint _capacity,
     string memory _originAddress,
@@ -993,6 +1130,7 @@ contract Rideshare is  Killable, DateTime {
      if(ride.departureTime == _DepartureTime){
       return (
       ride.driver,
+      ride.carName,
       ride.drivingCost,
       ride.capacity,
       ride.originAddress,
@@ -1009,6 +1147,7 @@ contract Rideshare is  Killable, DateTime {
   //filter by arrival time
   function filterByArrivalTime(uint rideNumber,uint _Arrivaltime ) public view returns(   
     address _driver,
+    string memory _carName,
     uint _drivingCost,
     uint _capacity,
     string memory _originAddress,
@@ -1022,6 +1161,7 @@ contract Rideshare is  Killable, DateTime {
      if(ride.arrivaltime == _Arrivaltime){
       return (
       ride.driver,
+      ride.carName,
       ride.drivingCost,
       ride.capacity,
       ride.originAddress,   
